@@ -1,0 +1,48 @@
+{
+  "type": "module",
+  "main": "dist/exports.js",
+  "scripts": {
+    "test:lint": "eslint",
+    "build": "tsc --build",
+    "test:unit": "vitest --run --passWithNoTests",
+    "test": "pnpm run \"/^test:/\""
+  },
+  "packageManager": "pnpm@10.6.0",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./dist/exports.js"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "3.3.1",
+    "@eslint/js": "9.37.0",
+    "@pnpm/find-workspace-packages": "6.0.9",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/micromatch": "^4.0.9",
+    "@types/node": "24.7.2",
+    "@types/ws": "^8.18.1",
+    "@vitest/coverage-v8": "3.2.4",
+    "eslint": "9.37.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-prettier": "5.5.4",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.1",
+    "vitest": "3.2.4"
+  },
+  "name": "@morten-olsen/backbone",
+  "version": "1.0.0",
+  "imports": {
+    "#root/*": "./src/*"
+  },
+  "dependencies": {
+    "aedes": "^0.51.3",
+    "aedes-persistence": "^10.2.2",
+    "jsonwebtoken": "^9.0.2",
+    "micromatch": "^4.0.8",
+    "ws": "^8.18.3",
+    "zod": "^4.1.12"
+  }
+}
