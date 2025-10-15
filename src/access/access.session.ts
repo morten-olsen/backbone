@@ -17,6 +17,10 @@ class Session {
     this.#options = options;
   }
 
+  public get statements() {
+    return this.#options.statements;
+  }
+
   public validate = (options: ValidateOptions) => {
     const { statements } = this.#options;
     return validate({

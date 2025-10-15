@@ -1,40 +1,53 @@
-import http from 'node:http';
 import tcp from 'node:net';
-import { WebSocketServer, createWebSocketStream } from 'ws';
+import type { IncomingMessage } from 'node:http';
+
 import {
-  createBroker,
   type AuthenticateHandler,
   type AuthorizeForwardHandler,
   type AuthorizePublishHandler,
   type AuthorizeSubscribeHandler,
   type PublishedHandler,
 } from 'aedes';
-import { AedesMemoryPersistence } from 'aedes-persistence';
-import { Session } from '../access/access.session.ts';
-import type { AccessTokens } from '#root/access/access.token.ts';
+import aedes from 'aedes';
+import fastify, { type FastifyInstance } from 'fastify';
+import fastifyWebSocket from '@fastify/websocket';
+import { createWebSocketStream } from 'ws';
 
-type Aedes = ReturnType<typeof createBroker>;
+import { Session } from '../access/access.session.ts';
+import { api } from '../api/api.ts';
+
+import type { AccessHandler } from '#root/access/access.handler.ts';
+import type { TopicsHandler } from '#root/topics/topics.handler.ts';
+
+type Aedes = ReturnType<typeof aedes.createBroker>;
 
 declare module 'aedes' {
+  // eslint-disable-next-line
   export interface Client {
     session: Session;
   }
 }
 
+const packetMetaSymbol = Symbol('packetMeta');
+
 type MqttServerOptions = {
-  accessTokens: AccessTokens;
+  accessHandler: AccessHandler;
+  topicsHandler: TopicsHandler;
 };
+
+class AuthError extends Error {
+  public readonly returnCode = 4;
+}
 
 class MqttServer {
   #options: MqttServerOptions;
   #server: Aedes;
-  #http?: http.Server;
+  #http?: Promise<FastifyInstance>;
   #tcp?: tcp.Server;
 
   constructor(options: MqttServerOptions) {
     this.#options = options;
-    this.#server = createBroker({
-      persistence: new AedesMemoryPersistence(),
+    this.#server = aedes.createBroker({
       authenticate: this.#authenticate,
       authorizePublish: this.#authorizePublish,
       authorizeSubscribe: this.#authorizeSubscribe,
@@ -43,25 +56,34 @@ class MqttServer {
     });
   }
 
-  #authenticate: AuthenticateHandler = (client, _username, password, callback) => {
-    if (!password) {
-      throw new Error('unauthorized');
+  #authenticate: AuthenticateHandler = async (client, username, password, callback) => {
+    try {
+      if (!username || !password) {
+        throw new Error('unauthorized');
+      }
+      const { accessHandler } = this.#options;
+      const auth = await accessHandler.validate(username, password.toString('utf8'));
+      client.session = new Session(auth);
+      callback(null, true);
+    } catch {
+      callback(new AuthError('Unautorized'), false);
     }
-    const { accessTokens } = this.#options;
-    const auth = accessTokens.validate(password.toString('utf8'));
-    client.session = new Session({
-      statements: auth.statements,
-    });
-    callback(null, true);
   };
 
   #authorizePublish: AuthorizePublishHandler = (client, packet, callback) => {
+    const { topicsHandler } = this.#options;
+    (packet as ExplicitAny)[packetMetaSymbol] = {
+      foo: 'bar',
+    };
     const authorized = client?.session.validate({
       action: 'mqtt:publish',
       resource: `mqtt:${packet.topic}`,
     });
     if (!authorized) {
       return callback(new Error('unauthorized'));
+    }
+    if (!topicsHandler.validate(packet)) {
+      return callback(new Error('rules not matched'));
     }
     callback();
   };
@@ -79,7 +101,7 @@ class MqttServer {
 
   #authorizeForward: AuthorizeForwardHandler = (client, packet) => {
     const authorized = client.session.validate({
-      action: 'mqtt:forward',
+      action: 'mqtt:read',
       resource: `mqtt:${packet.topic}`,
     });
     if (!authorized) {
@@ -92,16 +114,22 @@ class MqttServer {
     callback();
   };
 
+  #setupHttpServer = async () => {
+    const http = fastify({});
+    await http.register(fastifyWebSocket);
+    http.get('/ws', { websocket: true }, (socket, req) => {
+      const stream = createWebSocketStream(socket);
+      this.#server.handle(stream, req as unknown as IncomingMessage);
+    });
+    await http.register(api, {
+      prefix: '/api',
+    });
+    return http;
+  };
+
   public getHttpServer = () => {
     if (!this.#http) {
-      this.#http = http.createServer();
-      const wss = new WebSocketServer({
-        server: this.#http,
-      });
-      wss.on('connection', (websocket, req) => {
-        const stream = createWebSocketStream(websocket);
-        this.#server.handle(stream, req);
-      });
+      this.#http = this.#setupHttpServer();
     }
     return this.#http;
   };

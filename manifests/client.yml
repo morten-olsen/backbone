@@ -1,0 +1,10 @@
+apiVersion: 'backbone.mortenolsen.pro/v1'
+kind: Client
+metadata:
+  name: test
+  namespace: prod
+spec:
+  statements:
+    - effect: allow
+      resources: ['*']
+      actions: ['*']

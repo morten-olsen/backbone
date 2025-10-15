@@ -1,4 +1,5 @@
 import micromatch from 'micromatch';
+
 import type { Statement } from './access.schemas.ts';
 
 type ValidateOptions = {
