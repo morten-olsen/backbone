@@ -47,25 +47,30 @@ const client = mqtt.connect('ws://localhost:8883/ws')
 
 Backbone can be configured using environment variables:
 
-| Variable             | Description                              | Default     |
-| -------------------- | ---------------------------------------- | ----------- |
-| `ADMIN_TOKEN`        | Admin token for API requests             | `undefined` |
-| `JWT_SECRET`         | JWT signing secret for authentication    | `undefined` |
-| `K8S_ENABLED`        | Enable Kubernetes operator mode          | `false`     |
-| `WS_ENABLED`         | Enable WebSocket MQTT server             | `false`     |
-| `API_ENABLED`        | Enable HTTP API                          | `false`     |
-| `HTTP_PORT`          | HTTP server port                         | `8883`      |
-| `TCP_ENABLED`        | Enable TCP MQTT server                   | `false`     |
-| `TCP_PORT`           | TCP server port                          | `1883`      |
-| `OIDC_ENABLED`       | OIDC discovery URL                       | `false`     |
-| `OIDC_DISCOVERY`     | OIDC discovery URL                       | `undefined` |
-| `OIDC_CLIENT_ID`     | OIDC client ID                           | `undefined` |
-| `OIDC_CLIENT_SECRET` | OIDC client secret                       | `undefined` |
-| `OIDC_CLIENT_SECRET` | OIDC client secret                       | `undefined` |
-| `OIDC_GROUP_FIELD`   | JWT field for reading groups             | `'groups'`  |
-| `OIDC_ADMIN_GROUP`   | JWT group for admins                     | `undefined` |
-| `OIDC_WRITER_GROUP`  | JWT group with publish access to queue   | `undefined` |
-| `OIDC_READER_GROUP`  | JWT group with read-only access to queue | `undefined` |
+| Variable             | Description                              | Default      |
+| -------------------- | ---------------------------------------- | ------------ |
+| `ADMIN_TOKEN`        | Admin token for API requests             | `undefined`  |
+| `JWT_SECRET`         | JWT signing secret for authentication    | `undefined`  |
+| `K8S_ENABLED`        | Enable Kubernetes operator mode          | `false`      |
+| `WS_ENABLED`         | Enable WebSocket MQTT server             | `false`      |
+| `API_ENABLED`        | Enable HTTP API                          | `false`      |
+| `HTTP_PORT`          | HTTP server port                         | `8883`       |
+| `TCP_ENABLED`        | Enable TCP MQTT server                   | `false`      |
+| `TCP_PORT`           | TCP server port                          | `1883`       |
+| `OIDC_ENABLED`       | OIDC discovery URL                       | `false`      |
+| `OIDC_DISCOVERY`     | OIDC discovery URL                       | `undefined`  |
+| `OIDC_CLIENT_ID`     | OIDC client ID                           | `undefined`  |
+| `OIDC_CLIENT_SECRET` | OIDC client secret                       | `undefined`  |
+| `OIDC_CLIENT_SECRET` | OIDC client secret                       | `undefined`  |
+| `OIDC_GROUP_FIELD`   | JWT field for reading groups             | `'groups'`   |
+| `OIDC_ADMIN_GROUP`   | JWT group for admins                     | `undefined`  |
+| `OIDC_WRITER_GROUP`  | JWT group with publish access to queue   | `undefined`  |
+| `OIDC_READER_GROUP`  | JWT group with read-only access to queue | `undefined`  |
+| `REDIS_ENABLED`      | Enable redis persistance                 | `false`      |
+| `REDIS_HOST`         | Redis hostname                           | `'localhost` |
+| `REDIS_PORT`         | Redis port                               | `6379`       |
+| `REDIS_PASSWORD`     | Redis password                           | `undefined`  |
+| `REDIS_DB`           | Redis database                           | `0`          |
 
 ### Example Configuration
 

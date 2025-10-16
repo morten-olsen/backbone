@@ -43,6 +43,13 @@ const createWorld = async (options: WorldOptions) => {
       enabled: false,
       port: 1883,
     },
+    redis: {
+      enabled: false,
+      host: undefined,
+      password: undefined,
+      db: 0,
+      port: 0,
+    },
   });
   const accessTokens = backbone.services.get(JwtAuth);
   backbone.sessionProvider.register('token', accessTokens);

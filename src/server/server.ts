@@ -16,6 +16,8 @@ import fastify, { type FastifyInstance } from 'fastify';
 import fastifyWebSocket from '@fastify/websocket';
 import { createWebSocketStream } from 'ws';
 import fastifySensible from '@fastify/sensible';
+import redis from 'aedes-persistence-redis';
+import memory from 'aedes-persistence';
 
 import { api } from '../api/api.ts';
 
@@ -49,6 +51,7 @@ class MqttServer {
   constructor(services: Services) {
     this.#services = services;
     this.#server = aedes.createBroker({
+      persistence: this.#getPersistance(),
       authenticate: this.#authenticate,
       authorizePublish: this.#authorizePublish,
       authorizeSubscribe: this.#authorizeSubscribe,
@@ -60,6 +63,19 @@ class MqttServer {
   public get bus() {
     return this.#server;
   }
+
+  #getPersistance = () => {
+    const config = this.#services.get(Config);
+    if (config.redis.enabled) {
+      return redis({
+        host: config.redis.host,
+        port: config.redis.port,
+        password: config.redis.password,
+        db: config.redis.db,
+      });
+    }
+    return (memory as ExplicitAny)();
+  };
 
   #authenticate: AuthenticateHandler = async (client, username, password, callback) => {
     try {

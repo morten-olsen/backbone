@@ -49,7 +49,7 @@ class Backbone {
       const http = await this.server.getHttpServer();
       http.listen({ port: this.config.http.port, host: '0.0.0.0' });
     }
-    if (this.config.tcp) {
+    if (this.config.tcp.enabled) {
       const tcp = this.server.getTcpServer();
       tcp.listen(this.config.tcp.port);
     }
