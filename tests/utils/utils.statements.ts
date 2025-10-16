@@ -1,4 +1,4 @@
-import type { Statement } from '#root/access/access.schemas.ts';
+import type { Statement } from '#root/auth/auth.schemas.ts';
 
 const statements = {
   all: [

@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken';
 
 import type { Statement } from './auth.schemas.ts';
 import type { AuthProvider } from './auth.provider.ts';
+import { ADMIN_STATEMENTS, READER_STATEMENTS, WRITER_STATEMENTS } from './auth.consts.ts';
 
 import type { Services } from '#root/utils/services.ts';
 import { Config } from '#root/config/config.ts';
-import { ADMIN_STATEMENTS, READER_STATEMENTS, WRITER_STATEMENTS } from './auth.consts.ts';
 
 class OidcAuth implements AuthProvider {
   #services: Services;

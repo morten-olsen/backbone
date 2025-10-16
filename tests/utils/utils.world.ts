@@ -33,6 +33,16 @@ const createWorld = async (options: WorldOptions) => {
   backbone.services.set(Config, {
     jwtSecret: 'test',
     adminToken: 'test',
+    api: {
+      enabled: true,
+    },
+    ws: {
+      enabled: true,
+    },
+    tcp: {
+      enabled: false,
+      port: 1883,
+    },
   });
   const accessTokens = backbone.services.get(JwtAuth);
   backbone.sessionProvider.register('token', accessTokens);
@@ -61,7 +71,7 @@ const createWorld = async (options: WorldOptions) => {
     },
     destroy: async () => {
       await Promise.all(sockets.map((s) => s.endAsync()));
-      await fastify.close();
+      await backbone.destroy();
     },
   };
 };

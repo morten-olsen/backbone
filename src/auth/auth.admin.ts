@@ -1,7 +1,8 @@
-import type { Services } from '#root/utils/services.ts';
-import { Config } from '#root/config/config.ts';
 import type { AuthProvider } from './auth.provider.ts';
 import { ADMIN_STATEMENTS } from './auth.consts.ts';
+
+import type { Services } from '#root/utils/services.ts';
+import { Config } from '#root/config/config.ts';
 
 class AdminAuth implements AuthProvider {
   #services: Services;

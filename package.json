@@ -8,7 +8,7 @@
     "test:unit": "vitest --run --passWithNoTests",
     "test": "pnpm run \"/^test:/\""
   },
-  "packageManager": "pnpm@10.6.0",
+  "packageManager": "pnpm@10.18.0",
   "files": [
     "dist"
   ],

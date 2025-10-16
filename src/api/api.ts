@@ -1,8 +1,9 @@
 import { type FastifyPluginAsync } from 'fastify';
+import { z } from 'zod';
+
 import { manageEndpoints } from './endpoints/endpoints.manage.ts';
 import { authPlugin } from './plugins/plugins.auth.ts';
 import { messageEndpoints } from './endpoints/endpoints.message.ts';
-import { z } from 'zod';
 
 const api: FastifyPluginAsync = async (fastify) => {
   fastify.route({

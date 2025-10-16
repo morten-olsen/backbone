@@ -1,5 +1,6 @@
-import { SessionProvider } from '#root/services/sessions/sessions.provider.ts';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+
+import { SessionProvider } from '#root/services/sessions/sessions.provider.ts';
 
 const authPlugin: FastifyPluginAsyncZod = async (fastify) => {
   fastify.addHook('onRequest', async (req, reply) => {

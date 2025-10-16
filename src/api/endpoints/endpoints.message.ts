@@ -1,7 +1,8 @@
-import { Config } from '#root/config/config.ts';
-import { MqttServer } from '#root/server/server.ts';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+
+import { Config } from '#root/config/config.ts';
+import { MqttServer } from '#root/server/server.ts';
 
 const messageEndpoints: FastifyPluginAsyncZod = async (fastify) => {
   const config = fastify.services.get(Config);

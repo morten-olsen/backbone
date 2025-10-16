@@ -2,13 +2,7 @@ import tcp from 'node:net';
 import type { IncomingMessage } from 'node:http';
 
 import swagger from '@fastify/swagger';
-import type { ZodTypeProvider } from 'fastify-type-provider-zod';
-import {
-  jsonSchemaTransform,
-  createJsonSchemaTransform,
-  serializerCompiler,
-  validatorCompiler,
-} from 'fastify-type-provider-zod';
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import scalar from '@scalar/fastify-api-reference';
 import {
   type AuthenticateHandler,
@@ -21,14 +15,14 @@ import aedes from 'aedes';
 import fastify, { type FastifyInstance } from 'fastify';
 import fastifyWebSocket from '@fastify/websocket';
 import { createWebSocketStream } from 'ws';
+import fastifySensible from '@fastify/sensible';
 
 import { api } from '../api/api.ts';
 
 import { TopicsHandler } from '#root/topics/topics.handler.ts';
-import type { Services } from '#root/utils/services.ts';
+import { destroy, type Services } from '#root/utils/services.ts';
 import { Session } from '#root/services/sessions/sessions.session.ts';
 import { SessionProvider } from '#root/services/sessions/sessions.provider.ts';
-import fastifySensible from '@fastify/sensible';
 import { Config } from '#root/config/config.ts';
 
 type Aedes = ReturnType<typeof aedes.createBroker>;
@@ -187,6 +181,25 @@ class MqttServer {
       this.#tcp = tcp.createServer(this.#server.handle);
     }
     return this.#tcp;
+  };
+
+  [destroy] = async () => {
+    if (this.#http) {
+      const http = await this.#http;
+      await http.close();
+    }
+    await new Promise<void>((resolve, reject) => {
+      if (this.#tcp) {
+        this.#tcp.close((err) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
   };
 }
 

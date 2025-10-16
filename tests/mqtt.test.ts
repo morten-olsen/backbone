@@ -39,6 +39,7 @@ describe('mqtt', () => {
 
   it('should not be able to publish if not allowed', async () => {
     const [client] = await world.connect([]);
+    // eslint-disable-next-line
     const promise = client.publishAsync('test', 'test');
 
     // TODO: why does this not throw?

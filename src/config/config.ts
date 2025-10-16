@@ -59,7 +59,7 @@ class Config {
   }
 
   public get tcp() {
-    const enabled = (process.env.TCP_ENABLED = 'true');
+    const enabled = process.env.TCP_ENABLED === 'true';
     const port = process.env.TCP_PORT ? parseInt(process.env.TCP_PORT) : 1883;
     return {
       enabled,

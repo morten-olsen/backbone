@@ -1,5 +1,6 @@
-import type { AuthProvider } from '#root/auth/auth.provider.ts';
 import { Session } from './sessions.session.ts';
+
+import type { AuthProvider } from '#root/auth/auth.provider.ts';
 
 class SessionProvider {
   #handlers: Map<string, AuthProvider>;

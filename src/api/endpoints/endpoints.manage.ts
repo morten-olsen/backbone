@@ -1,8 +1,9 @@
+import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
+
 import { JwtAuth } from '#root/auth/auth.jwt.ts';
 import { statementSchema } from '#root/auth/auth.schemas.ts';
 import { Config } from '#root/config/config.ts';
-import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
 
 const manageEndpoints: FastifyPluginAsyncZod = async (fastify) => {
   const config = fastify.services.get(Config);
