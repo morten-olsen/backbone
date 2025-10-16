@@ -16,8 +16,9 @@ import { createWebSocketStream } from 'ws';
 import { Session } from '../access/access.session.ts';
 import { api } from '../api/api.ts';
 
-import type { AccessHandler } from '#root/access/access.handler.ts';
-import type { TopicsHandler } from '#root/topics/topics.handler.ts';
+import { AccessHandler } from '#root/access/access.handler.ts';
+import { TopicsHandler } from '#root/topics/topics.handler.ts';
+import type { Services } from '#root/utils/services.ts';
 
 type Aedes = ReturnType<typeof aedes.createBroker>;
 
@@ -30,23 +31,18 @@ declare module 'aedes' {
 
 const packetMetaSymbol = Symbol('packetMeta');
 
-type MqttServerOptions = {
-  accessHandler: AccessHandler;
-  topicsHandler: TopicsHandler;
-};
-
 class AuthError extends Error {
   public readonly returnCode = 4;
 }
 
 class MqttServer {
-  #options: MqttServerOptions;
+  #services: Services;
   #server: Aedes;
   #http?: Promise<FastifyInstance>;
   #tcp?: tcp.Server;
 
-  constructor(options: MqttServerOptions) {
-    this.#options = options;
+  constructor(services: Services) {
+    this.#services = services;
     this.#server = aedes.createBroker({
       authenticate: this.#authenticate,
       authorizePublish: this.#authorizePublish,
@@ -61,7 +57,7 @@ class MqttServer {
       if (!username || !password) {
         throw new Error('unauthorized');
       }
-      const { accessHandler } = this.#options;
+      const accessHandler = this.#services.get(AccessHandler);
       const auth = await accessHandler.validate(username, password.toString('utf8'));
       client.session = new Session(auth);
       callback(null, true);
@@ -71,7 +67,7 @@ class MqttServer {
   };
 
   #authorizePublish: AuthorizePublishHandler = (client, packet, callback) => {
-    const { topicsHandler } = this.#options;
+    const topicsHandler = this.#services.get(TopicsHandler);
     (packet as ExplicitAny)[packetMetaSymbol] = {
       foo: 'bar',
     };

@@ -8,6 +8,7 @@ import { MqttServer } from '#root/server/server.ts';
 import type { TopicDefinition } from '#root/topics/topcis.schemas.ts';
 import { TopicsHandler } from '#root/topics/topics.handler.ts';
 import { TopicsStore } from '#root/topics/topics.store.ts';
+import { Backbone } from '#root/backbone.ts';
 
 type CreateSocketOptions = {
   port: number;
@@ -30,17 +31,16 @@ type WorldOptions = {
 
 const createWorld = async (options: WorldOptions) => {
   const { topics = [] } = options;
+  const backbone = new Backbone();
   const secret = 'test';
-  const accessHandler = new AccessHandler();
   const accessTokens = new AccessTokens({
     secret,
   });
-  accessHandler.register('token', accessTokens);
-  const topicsHandler = new TopicsHandler();
+  backbone.accessHandler.register('token', accessTokens);
   const topicsStore = new TopicsStore();
   topicsStore.register(...topics);
-  topicsHandler.register(topicsStore);
-  const server = new MqttServer({ topicsHandler, accessHandler });
+  backbone.topicsHandler.register(topicsStore);
+  const server = backbone.server;
   const fastify = await server.getHttpServer();
   const port = await getPort();
   await fastify.listen({ port });

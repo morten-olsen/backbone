@@ -1,51 +1,43 @@
 import { KubeConfig } from '@kubernetes/client-node';
 
 import { K8sResources } from './k8s.resources.ts';
-import { createCrd } from './k8s.crd.ts';
+import { K8sCrds } from './k8s.crd.ts';
 import { k8sBackboneClientSchema, k8sBackboneTopicSchema } from './k8s.schemas.ts';
 import { K8sClients } from './k8s.clients.ts';
 
 import { API_VERSION } from '#root/utils/consts.ts';
+import type { Services } from '#root/utils/services.ts';
 
 class K8sService {
-  #config: KubeConfig;
-  #resources: K8sResources;
-  #clients: K8sClients;
+  #services: Services;
 
-  constructor() {
-    this.#config = new KubeConfig();
-    this.#config.loadFromDefault();
-    this.#resources = new K8sResources(this.#config);
-    this.#clients = new K8sClients({
-      config: this.#config,
-      resources: this.resources,
-    });
+  constructor(services: Services) {
+    this.#services = services;
   }
 
   public get resources() {
-    return this.#resources;
+    return this.#services.get(K8sResources);
   }
 
   public get clients() {
-    return this.#clients;
+    return this.#services.get(K8sClients);
   }
 
   public setup = async () => {
-    await createCrd({
-      config: this.#config,
+    const crds = this.#services.get(K8sCrds);
+    await crds.install({
       apiVersion: API_VERSION,
       kind: 'Client',
       scope: 'Namespaced',
       spec: k8sBackboneClientSchema,
     });
-    await createCrd({
-      config: this.#config,
+    await crds.install({
       apiVersion: API_VERSION,
       kind: 'Topic',
       scope: 'Namespaced',
       spec: k8sBackboneTopicSchema,
     });
-    await this.#resources.start();
+    await this.resources.start();
   };
 }
 

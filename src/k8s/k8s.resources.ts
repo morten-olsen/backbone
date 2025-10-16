@@ -1,48 +1,60 @@
-import { KubeConfig, V1Secret, type KubernetesObject } from '@kubernetes/client-node';
+import { V1Secret, type KubernetesObject } from '@kubernetes/client-node';
 
 import { K8sWatcher } from './k8s.watcher.ts';
 import type { K8sBackboneClient, K8sBackboneTopic } from './k8s.schemas.ts';
+import type { Services } from '#root/utils/services.ts';
+import { K8sConfig } from './k8s.config.ts';
 
 class K8sResources {
-  #secrets: K8sWatcher<V1Secret>;
-  #clients: K8sWatcher<KubernetesObject & { spec: K8sBackboneClient }>;
-  #topics: K8sWatcher<KubernetesObject & { spec: K8sBackboneTopic }>;
+  #services: Services;
+  #secrets?: K8sWatcher<V1Secret>;
+  #clients?: K8sWatcher<KubernetesObject & { spec: K8sBackboneClient }>;
+  #topics?: K8sWatcher<KubernetesObject & { spec: K8sBackboneTopic }>;
 
-  constructor(config: KubeConfig) {
-    config.loadFromDefault();
-    this.#secrets = new K8sWatcher({
-      config,
-      apiVersion: 'v1',
-      kind: 'Secret',
-    });
-    this.#clients = new K8sWatcher({
-      config,
-      apiVersion: 'backbone.mortenolsen.pro/v1',
-      kind: 'Client',
-    });
-    this.#topics = new K8sWatcher({
-      config,
-      apiVersion: 'backbone.mortenolsen.pro/v1',
-      kind: 'Topic',
-    });
+  constructor(services: Services) {
+    this.#services = services;
   }
 
   public get secrets() {
+    if (!this.#secrets) {
+      const { config } = this.#services.get(K8sConfig);
+      this.#secrets = new K8sWatcher({
+        config,
+        apiVersion: 'v1',
+        kind: 'Secret',
+      });
+    }
     return this.#secrets;
   }
 
   public get clients() {
+    if (!this.#clients) {
+      const { config } = this.#services.get(K8sConfig);
+      this.#clients = new K8sWatcher({
+        config,
+        apiVersion: 'backbone.mortenolsen.pro/v1',
+        kind: 'Client',
+      });
+    }
     return this.#clients;
   }
 
   public get topics() {
-    return this.#clients;
+    if (!this.#topics) {
+      const { config } = this.#services.get(K8sConfig);
+      this.#topics = new K8sWatcher({
+        config,
+        apiVersion: 'backbone.mortenolsen.pro/v1',
+        kind: 'Topic',
+      });
+    }
+    return this.#topics;
   }
 
   public start = async () => {
-    await this.#secrets.start();
-    await this.#clients.start();
-    await this.#topics.start();
+    await this.secrets.start();
+    await this.clients.start();
+    await this.topics.start();
   };
 }
 
