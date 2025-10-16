@@ -1,0 +1,40 @@
+# Backbone MQTT Broker - AI Agent Documentation
+
+## Project Overview
+Kubernetes-native MQTT broker with JWT authentication and IAM-style access control. Built with TypeScript, Node.js, Fastify, Aedes MQTT broker, Kubernetes client, and Zod validation.
+
+## Project Structure
+- `src/access/` - JWT authentication and IAM-style authorization
+- `src/api/` - HTTP API endpoints (Fastify)
+- `src/config/` - Environment-based configuration
+- `src/k8s/` - Kubernetes operator and CRD management
+- `src/server/` - MQTT broker implementation (Aedes)
+- `src/topics/` - Topic validation and rules
+- `src/utils/` - Service container and shared utilities
+
+## Code Style Rules
+- Always use `.ts` file extensions in imports
+- No default exports (use named exports only)
+- Use `type` keyword for type definitions (not `interface`)
+- Import order: builtin → external → internal → parent → sibling → index
+- Add newlines between import groups
+- Use path alias `#root/*` for absolute imports from `src/`
+- Private class fields use `#` prefix (e.g., `#services`)
+
+## TypeScript Configuration
+- Module system: ESNext with NodeNext resolution
+- Strict mode enabled
+- Use `.ts` extensions in imports (allowImportingTsExtensions)
+
+## Available Commands
+- `pnpm dev` - Watch mode development
+- `pnpm build` - TypeScript compilation
+- `pnpm test` - Run all tests (lint + unit)
+- `pnpm test:lint` - ESLint check
+- `pnpm test:unit` - Vitest unit tests
+
+## Key Patterns
+- Dependency injection via `Services` container class
+- Zod schemas for validation
+- Environment variables via `Config` class
+- Event-driven architecture for K8s resource watching
