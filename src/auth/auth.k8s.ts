@@ -1,18 +1,18 @@
 import { KubernetesObjectApi, type KubernetesObject } from '@kubernetes/client-node';
 
-import { K8sResources } from './k8s.resources.ts';
-import type { K8sBackboneClient } from './k8s.schemas.ts';
+import type { AuthProvider } from './auth.provider.ts';
+import type { Statement } from './auth.schemas.ts';
 
-import type { AccessProvider } from '#root/access/access.provider.ts';
-import type { Statement } from '#root/access/access.schemas.ts';
 import type { Services } from '#root/utils/services.ts';
-import { K8sConfig } from './k8s.config.ts';
+import { K8sResources } from '#root/services/k8s/k8s.resources.ts';
+import type { K8sBackboneClient } from '#root/services/k8s/k8s.schemas.ts';
+import { K8sConfig } from '#root/services/k8s/k8s.config.ts';
 
 type K8sClient = {
   statements: Statement[];
 };
 
-class K8sClients implements AccessProvider {
+class K8sAuth implements AuthProvider {
   #services: Services;
   #clients: Map<string, K8sClient>;
 
@@ -65,4 +65,4 @@ class K8sClients implements AccessProvider {
   };
 }
 
-export { K8sClients };
+export { K8sAuth };

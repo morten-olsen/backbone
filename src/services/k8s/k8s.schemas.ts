@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { statementSchema } from '#root/access/access.schemas.ts';
+import { statementSchema } from '#root/auth/auth.schemas.ts';
 
 const k8sBackboneClientSchema = z.object({
   statements: z.array(statementSchema),

@@ -1,9 +1,6 @@
-import { KubeConfig } from '@kubernetes/client-node';
-
 import { K8sResources } from './k8s.resources.ts';
 import { K8sCrds } from './k8s.crd.ts';
 import { k8sBackboneClientSchema, k8sBackboneTopicSchema } from './k8s.schemas.ts';
-import { K8sClients } from './k8s.clients.ts';
 
 import { API_VERSION } from '#root/utils/consts.ts';
 import type { Services } from '#root/utils/services.ts';
@@ -17,10 +14,6 @@ class K8sService {
 
   public get resources() {
     return this.#services.get(K8sResources);
-  }
-
-  public get clients() {
-    return this.#services.get(K8sClients);
   }
 
   public setup = async () => {

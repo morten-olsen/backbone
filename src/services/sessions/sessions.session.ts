@@ -1,5 +1,6 @@
-import type { Statement } from './access.schemas.ts';
-import { validate } from './access.utils.ts';
+import { validate } from './sessions.utils.ts';
+
+import type { Statement } from '#root/auth/auth.schemas.ts';
 
 type SessionOptions = {
   statements: Statement[];

@@ -3,6 +3,10 @@ class Config {
     return process.env.TOKEN_SECRET;
   }
 
+  public get adminToken() {
+    return process.env.ADMIN_TOKEN;
+  }
+
   public get oidc() {
     const enabled = process.env.OIDC_ENABLED === 'true';
     const discoveryUrl = process.env.OIDC_DISCOVERY_URL;

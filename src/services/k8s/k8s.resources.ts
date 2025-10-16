@@ -2,8 +2,9 @@ import { V1Secret, type KubernetesObject } from '@kubernetes/client-node';
 
 import { K8sWatcher } from './k8s.watcher.ts';
 import type { K8sBackboneClient, K8sBackboneTopic } from './k8s.schemas.ts';
-import type { Services } from '#root/utils/services.ts';
 import { K8sConfig } from './k8s.config.ts';
+
+import type { Services } from '#root/utils/services.ts';
 
 class K8sResources {
   #services: Services;

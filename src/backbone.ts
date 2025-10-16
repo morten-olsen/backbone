@@ -1,9 +1,10 @@
-import { AccessHandler } from './access/access.handler.ts';
-import { AccessTokens } from './access/access.token.ts';
+import { JwtAuth } from './auth/auth.jwt.ts';
+import { K8sAuth } from './auth/auth.k8s.ts';
+import { OidcAuth } from './auth/auth.oidc.ts';
 import { Config } from './config/config.ts';
-import { K8sService } from './k8s/k8s.ts';
-import { OidcHandler } from './oidc/oidc.handler.ts';
 import { MqttServer } from './server/server.ts';
+import { K8sService } from './services/k8s/k8s.ts';
+import { SessionProvider } from './services/sessions/sessions.provider.ts';
 import { TopicsHandler } from './topics/topics.handler.ts';
 import { Services } from './utils/services.ts';
 
@@ -26,8 +27,8 @@ class Backbone {
     return this.#services.get(MqttServer);
   }
 
-  public get accessHandler() {
-    return this.#services.get(AccessHandler);
+  public get sessionProvider() {
+    return this.#services.get(SessionProvider);
   }
 
   public get topicsHandler() {
@@ -41,7 +42,7 @@ class Backbone {
   public start = async () => {
     if (this.config.k8s.enabled) {
       await this.k8s.setup();
-      this.accessHandler.register('k8s', this.k8s.clients);
+      this.sessionProvider.register('k8s', this.#services.get(K8sAuth));
     }
     if (this.config.http.enabled) {
       console.log('starting http');
@@ -53,10 +54,10 @@ class Backbone {
       tcp.listen(this.config.tcp.port);
     }
     if (this.config.oidc.enabled) {
-      this.accessHandler.register('oidc', this.#services.get(OidcHandler));
+      this.sessionProvider.register('oidc', this.#services.get(OidcAuth));
     }
     if (this.config.tokenSecret) {
-      this.accessHandler.register('token', this.#services.get(AccessTokens));
+      this.sessionProvider.register('token', this.#services.get(JwtAuth));
     }
   };
 

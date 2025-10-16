@@ -1,14 +1,11 @@
-import mqtt, { connectAsync, MqttClient } from 'mqtt';
+import { connectAsync, MqttClient } from 'mqtt';
 import getPort from 'get-port';
 
-import { AccessHandler } from '#root/access/access.handler.ts';
-import { type Statement } from '#root/access/access.schemas.ts';
-import { AccessTokens } from '#root/access/access.token.ts';
-import { MqttServer } from '#root/server/server.ts';
 import type { TopicDefinition } from '#root/topics/topcis.schemas.ts';
-import { TopicsHandler } from '#root/topics/topics.handler.ts';
 import { TopicsStore } from '#root/topics/topics.store.ts';
 import { Backbone } from '#root/backbone.ts';
+import { JwtAuth } from '#root/auth/auth.jwt.ts';
+import type { Statement } from '#root/auth/auth.schemas.ts';
 
 type CreateSocketOptions = {
   port: number;
@@ -32,11 +29,8 @@ type WorldOptions = {
 const createWorld = async (options: WorldOptions) => {
   const { topics = [] } = options;
   const backbone = new Backbone();
-  const secret = 'test';
-  const accessTokens = new AccessTokens({
-    secret,
-  });
-  backbone.accessHandler.register('token', accessTokens);
+  const accessTokens = backbone.services.get(JwtAuth);
+  backbone.sessionProvider.register('token', accessTokens);
   const topicsStore = new TopicsStore();
   topicsStore.register(...topics);
   backbone.topicsHandler.register(topicsStore);

@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 
-import type { AccessProvider } from '#root/access/access.provider.ts';
+import type { Statement } from './auth.schemas.ts';
+import type { AuthProvider } from './auth.provider.ts';
+
 import type { Services } from '#root/utils/services.ts';
-import type { Statement } from '#root/access/access.schemas.ts';
 import { Config } from '#root/config/config.ts';
 
 const adminStatements: Statement[] = [
@@ -27,7 +28,7 @@ const readerStatements: Statement[] = [
   },
 ];
 
-class OidcHandler implements AccessProvider {
+class OidcAuth implements AuthProvider {
   #services: Services;
 
   constructor(services: Services) {
@@ -63,4 +64,4 @@ class OidcHandler implements AccessProvider {
   };
 }
 
-export { OidcHandler };
+export { OidcAuth };

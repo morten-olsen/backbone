@@ -1,6 +1,6 @@
 import micromatch from 'micromatch';
 
-import type { Statement } from './access.schemas.ts';
+import type { Statement } from '#root/auth/auth.schemas.ts';
 
 type ValidateOptions = {
   action: string;

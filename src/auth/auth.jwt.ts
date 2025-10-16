@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 
-import { statementSchema } from './access.schemas.ts';
-import type { AccessProvider } from './access.provider.ts';
+import { statementSchema } from './auth.schemas.ts';
+import type { AuthProvider } from './auth.provider.ts';
+
 import type { Services } from '#root/utils/services.ts';
 import { Config } from '#root/config/config.ts';
 
@@ -12,7 +13,7 @@ const tokenBodySchema = z.object({
 
 type TokenBody = z.infer<typeof tokenBodySchema>;
 
-class AccessTokens implements AccessProvider {
+class JwtAuth implements AuthProvider {
   #services: Services;
 
   constructor(services: Services) {
@@ -41,4 +42,4 @@ class AccessTokens implements AccessProvider {
   };
 }
 
-export { AccessTokens };
+export { JwtAuth };

@@ -1,13 +1,13 @@
-import type { AccessProvider } from './access.provider.ts';
+import type { AuthProvider } from '#root/auth/auth.provider.ts';
 
-class AccessHandler {
-  #handlers: Map<string, AccessProvider>;
+class SessionProvider {
+  #handlers: Map<string, AuthProvider>;
 
   constructor() {
     this.#handlers = new Map();
   }
 
-  public register = (name: string, provider: AccessProvider) => {
+  public register = (name: string, provider: AuthProvider) => {
     this.#handlers.set(name, provider);
   };
 
@@ -20,4 +20,4 @@ class AccessHandler {
   };
 }
 
-export { AccessHandler };
+export { SessionProvider };
