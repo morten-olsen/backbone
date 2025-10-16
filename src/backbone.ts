@@ -1,3 +1,4 @@
+import { AdminAuth } from './auth/auth.admin.ts';
 import { JwtAuth } from './auth/auth.jwt.ts';
 import { K8sAuth } from './auth/auth.k8s.ts';
 import { OidcAuth } from './auth/auth.oidc.ts';
@@ -56,8 +57,11 @@ class Backbone {
     if (this.config.oidc.enabled) {
       this.sessionProvider.register('oidc', this.#services.get(OidcAuth));
     }
-    if (this.config.tokenSecret) {
-      this.sessionProvider.register('token', this.#services.get(JwtAuth));
+    if (this.config.jwtSecret) {
+      this.sessionProvider.register('jwt', this.#services.get(JwtAuth));
+    }
+    if (this.config.adminToken) {
+      this.sessionProvider.register('admin', this.#services.get(AdminAuth));
     }
   };
 

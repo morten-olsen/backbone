@@ -6,6 +6,7 @@ import { TopicsStore } from '#root/topics/topics.store.ts';
 import { Backbone } from '#root/backbone.ts';
 import { JwtAuth } from '#root/auth/auth.jwt.ts';
 import type { Statement } from '#root/auth/auth.schemas.ts';
+import { Config } from '#root/config/config.ts';
 
 type CreateSocketOptions = {
   port: number;
@@ -29,6 +30,10 @@ type WorldOptions = {
 const createWorld = async (options: WorldOptions) => {
   const { topics = [] } = options;
   const backbone = new Backbone();
+  backbone.services.set(Config, {
+    jwtSecret: 'test',
+    adminToken: 'test',
+  });
   const accessTokens = backbone.services.get(JwtAuth);
   backbone.sessionProvider.register('token', accessTokens);
   const topicsStore = new TopicsStore();

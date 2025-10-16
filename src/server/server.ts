@@ -13,12 +13,12 @@ import fastify, { type FastifyInstance } from 'fastify';
 import fastifyWebSocket from '@fastify/websocket';
 import { createWebSocketStream } from 'ws';
 
-import { Session } from '../access/access.session.ts';
 import { api } from '../api/api.ts';
 
-import { AccessHandler } from '#root/access/access.handler.ts';
 import { TopicsHandler } from '#root/topics/topics.handler.ts';
 import type { Services } from '#root/utils/services.ts';
+import { Session } from '#root/services/sessions/sessions.session.ts';
+import { SessionProvider } from '#root/services/sessions/sessions.provider.ts';
 
 type Aedes = ReturnType<typeof aedes.createBroker>;
 
@@ -57,8 +57,8 @@ class MqttServer {
       if (!username || !password) {
         throw new Error('unauthorized');
       }
-      const accessHandler = this.#services.get(AccessHandler);
-      const auth = await accessHandler.validate(username, password.toString('utf8'));
+      const sessionProvider = this.#services.get(SessionProvider);
+      const auth = await sessionProvider.validate(username, password.toString('utf8'));
       client.session = new Session(auth);
       callback(null, true);
     } catch {

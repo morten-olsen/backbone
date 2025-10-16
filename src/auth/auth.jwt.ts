@@ -22,7 +22,7 @@ class JwtAuth implements AuthProvider {
 
   public generate = (options: TokenBody) => {
     const config = this.#services.get(Config);
-    const { tokenSecret } = config;
+    const { jwtSecret: tokenSecret } = config;
     if (!tokenSecret) {
       throw new Error('Token secret does not exist');
     }
@@ -32,7 +32,7 @@ class JwtAuth implements AuthProvider {
 
   public getAccess = async (token: string) => {
     const config = this.#services.get(Config);
-    const { tokenSecret } = config;
+    const { jwtSecret: tokenSecret } = config;
     if (!tokenSecret) {
       throw new Error('Token secret does not exist');
     }

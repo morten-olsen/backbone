@@ -1,5 +1,5 @@
 class Config {
-  public get tokenSecret() {
+  public get jwtSecret() {
     return process.env.TOKEN_SECRET;
   }
 
