@@ -27,7 +27,7 @@ docker-compose up -d
 2. The broker will be available on:
    - **TCP MQTT**: `tcp://localhost:1883`
    - **WebSocket MQTT**: `ws://localhost:8883/ws`
-   - **HTTP API**: `http://localhost:8883/api`
+   - **HTTP API Documentation**: `http://localhost:8883/docs`
 
 3. Connect with an MQTT client:
 
@@ -62,7 +62,7 @@ Backbone can be configured using environment variables:
 | `OIDC_CLIENT_ID`     | OIDC client ID                           | `undefined` |
 | `OIDC_CLIENT_SECRET` | OIDC client secret                       | `undefined` |
 | `OIDC_CLIENT_SECRET` | OIDC client secret                       | `undefined` |
-| `OIDC_GROUP_FIELD`   | JWT field for reading groups             | `groups`    |
+| `OIDC_GROUP_FIELD`   | JWT field for reading groups             | `'groups'`  |
 | `OIDC_ADMIN_GROUP`   | JWT group for admins                     | `undefined` |
 | `OIDC_WRITER_GROUP`  | JWT group with publish access to queue   | `undefined` |
 | `OIDC_READER_GROUP`  | JWT group with read-only access to queue | `undefined` |
@@ -143,10 +143,11 @@ statements:
 
 #### Resource Patterns
 
-- `*` - All topics
-- `sensors/*` - All topics under sensors/
-- `sensors/+/data` - Topics matching the pattern (single-level wildcard)
-- `sensors/#` - All topics under sensors/ (multi-level wildcard)
+- `*` - All resources
+- `mqtt:\*` - All mqtt topics
+- `mqtt:sensors/**` - All topics under sensors/
+- `mqtt:sensors/*/data` - Topics matching the pattern (single-level wildcard)
+- `mqtt:sensors/**/data` - Topics matching the pattern (multi-level wildcard)
 
 ## API
 
