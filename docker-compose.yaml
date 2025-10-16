@@ -1,0 +1,12 @@
+name: backbone
+services:
+  app:
+    build:
+      context: .
+    environment:
+      HTTP_ENABLED: 'true'
+      TCP_ENABLED: 'true'
+      TOKEN_SECRET: 'test'
+    ports:
+      - 1883:1883
+      - 8883:8883

@@ -2,6 +2,7 @@
   "type": "module",
   "main": "dist/exports.js",
   "scripts": {
+    "dev": "node --no-warnings --watch src/start.ts",
     "test:lint": "eslint",
     "build": "tsc --build",
     "test:unit": "vitest --run --passWithNoTests",
