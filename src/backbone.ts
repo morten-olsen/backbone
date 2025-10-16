@@ -45,8 +45,7 @@ class Backbone {
       await this.k8s.setup();
       this.sessionProvider.register('k8s', this.#services.get(K8sAuth));
     }
-    if (this.config.http.enabled) {
-      console.log('starting http');
+    if (this.config.ws.enabled || this.config.api.enabled) {
       const http = await this.server.getHttpServer();
       http.listen({ port: this.config.http.port, host: '0.0.0.0' });
     }

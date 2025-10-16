@@ -8,6 +8,7 @@ import type { Services } from '#root/utils/services.ts';
 import { Config } from '#root/config/config.ts';
 
 const tokenBodySchema = z.object({
+  exp: z.number().optional(),
   statements: z.array(statementSchema),
 });
 
@@ -32,11 +33,11 @@ class JwtAuth implements AuthProvider {
 
   public getAccess = async (token: string) => {
     const config = this.#services.get(Config);
-    const { jwtSecret: tokenSecret } = config;
-    if (!tokenSecret) {
+    const { jwtSecret } = config;
+    if (!jwtSecret) {
       throw new Error('Token secret does not exist');
     }
-    const data = jwt.verify(token, tokenSecret);
+    const data = jwt.verify(token, jwtSecret);
     const parsed = tokenBodySchema.parse(data);
     return parsed;
   };

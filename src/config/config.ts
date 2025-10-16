@@ -1,6 +1,6 @@
 class Config {
   public get jwtSecret() {
-    return process.env.TOKEN_SECRET;
+    return process.env.JWT_SECRET;
   }
 
   public get adminToken() {
@@ -38,11 +38,23 @@ class Config {
   }
 
   public get http() {
-    const enabled = (process.env.HTTP_ENABLED = 'true');
     const port = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 8883;
     return {
-      enabled,
       port,
+    };
+  }
+
+  public get api() {
+    const enabled = process.env.API_ENABLED === 'true';
+    return {
+      enabled,
+    };
+  }
+
+  public get ws() {
+    const enabled = process.env.WS_ENABLED === 'true';
+    return {
+      enabled,
     };
   }
 

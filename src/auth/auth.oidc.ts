@@ -5,28 +5,7 @@ import type { AuthProvider } from './auth.provider.ts';
 
 import type { Services } from '#root/utils/services.ts';
 import { Config } from '#root/config/config.ts';
-
-const adminStatements: Statement[] = [
-  {
-    effect: 'allow',
-    resources: ['**'],
-    actions: ['**'],
-  },
-];
-const writerStatements: Statement[] = [
-  {
-    effect: 'allow',
-    resources: ['**'],
-    actions: ['mqtt:**'],
-  },
-];
-const readerStatements: Statement[] = [
-  {
-    effect: 'allow',
-    resources: ['**'],
-    actions: ['mqtt:read', 'mqtt:subscribe'],
-  },
-];
+import { ADMIN_STATEMENTS, READER_STATEMENTS, WRITER_STATEMENTS } from './auth.consts.ts';
 
 class OidcAuth implements AuthProvider {
   #services: Services;
@@ -49,13 +28,13 @@ class OidcAuth implements AuthProvider {
     const groups = data[config.oidc.groupField];
     if (Array.isArray(groups)) {
       if (config.oidc.groups.admin && groups.includes(config.oidc.groups.admin)) {
-        statements = adminStatements;
+        statements = ADMIN_STATEMENTS;
       }
       if (config.oidc.groups.writer && groups.includes(config.oidc.groups.writer)) {
-        statements = writerStatements;
+        statements = WRITER_STATEMENTS;
       }
       if (config.oidc.groups.reader && groups.includes(config.oidc.groups.reader)) {
-        statements = readerStatements;
+        statements = READER_STATEMENTS;
       }
     }
     return {

@@ -1,15 +1,7 @@
 import type { Services } from '#root/utils/services.ts';
 import { Config } from '#root/config/config.ts';
-import type { Statement } from './auth.schemas.ts';
 import type { AuthProvider } from './auth.provider.ts';
-
-const adminStatements: Statement[] = [
-  {
-    effect: 'allow',
-    resources: ['**'],
-    actions: ['**'],
-  },
-];
+import { ADMIN_STATEMENTS } from './auth.consts.ts';
 
 class AdminAuth implements AuthProvider {
   #services: Services;
@@ -24,7 +16,7 @@ class AdminAuth implements AuthProvider {
       throw new Error('Invalid admin token');
     }
     return {
-      statements: adminStatements,
+      statements: ADMIN_STATEMENTS,
     };
   };
 }

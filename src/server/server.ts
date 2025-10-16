@@ -1,6 +1,15 @@
 import tcp from 'node:net';
 import type { IncomingMessage } from 'node:http';
 
+import swagger from '@fastify/swagger';
+import type { ZodTypeProvider } from 'fastify-type-provider-zod';
+import {
+  jsonSchemaTransform,
+  createJsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+} from 'fastify-type-provider-zod';
+import scalar from '@scalar/fastify-api-reference';
 import {
   type AuthenticateHandler,
   type AuthorizeForwardHandler,
@@ -19,6 +28,8 @@ import { TopicsHandler } from '#root/topics/topics.handler.ts';
 import type { Services } from '#root/utils/services.ts';
 import { Session } from '#root/services/sessions/sessions.session.ts';
 import { SessionProvider } from '#root/services/sessions/sessions.provider.ts';
+import fastifySensible from '@fastify/sensible';
+import { Config } from '#root/config/config.ts';
 
 type Aedes = ReturnType<typeof aedes.createBroker>;
 
@@ -50,6 +61,10 @@ class MqttServer {
       authorizeForward: this.#authorizeForward,
       published: this.#published,
     });
+  }
+
+  public get bus() {
+    return this.#server;
   }
 
   #authenticate: AuthenticateHandler = async (client, username, password, callback) => {
@@ -112,14 +127,51 @@ class MqttServer {
 
   #setupHttpServer = async () => {
     const http = fastify({});
-    await http.register(fastifyWebSocket);
-    http.get('/ws', { websocket: true }, (socket, req) => {
-      const stream = createWebSocketStream(socket);
-      this.#server.handle(stream, req as unknown as IncomingMessage);
-    });
-    await http.register(api, {
-      prefix: '/api',
-    });
+    const config = this.#services.get(Config);
+    if (config.api.enabled) {
+      http.decorate('services', this.#services);
+      http.setValidatorCompiler(validatorCompiler);
+      http.setSerializerCompiler(serializerCompiler);
+      await http.register(fastifyWebSocket);
+      await http.register(fastifySensible);
+      await http.register(swagger, {
+        openapi: {
+          info: {
+            title: 'Backbone',
+            version: '1.0.0',
+          },
+          components: {
+            securitySchemes: {
+              authProviderHeader: {
+                type: 'apiKey',
+                name: 'X-Auth-Provider',
+                in: 'header',
+              },
+              bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+              },
+            },
+          },
+          security: [{ bearerAuth: [], authProviderHeader: [] }],
+        },
+        transform: jsonSchemaTransform,
+      });
+      await http.register(scalar, {
+        routePrefix: '/docs',
+      });
+      await http.register(api, {
+        prefix: '/api',
+      });
+    }
+    if (config.ws.enabled) {
+      http.get('/ws', { websocket: true }, (socket, req) => {
+        const stream = createWebSocketStream(socket);
+        this.#server.handle(stream, req as unknown as IncomingMessage);
+      });
+    }
+    await http.ready();
+    http.swagger();
     return http;
   };
 
