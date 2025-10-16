@@ -2,15 +2,26 @@ name: backbone
 services:
   redis:
     image: redis
+    networks:
+      - backbone
     ports:
       - 6379:6379
-  # app:
-  #   build:
-  #     context: .
-  #   environment:
-  #     HTTP_ENABLED: 'true'
-  #     TCP_ENABLED: 'true'
-  #     TOKEN_SECRET: 'test'
-  #   ports:
-  #     - 1883:1883
-  #     - 8883:8883
+  app:
+    build:
+      context: .
+    networks:
+      - backbone
+    environment:
+      API_ENABLED: 'true'
+      WS_ENABLED: 'true'
+      TCP_ENABLED: 'true'
+      ADMIN_TOKEN: 'admin'
+      JWT_SECRET: 'test'
+      REDIS_ENABLED: 'true'
+      REDIS_HOST: 'redis'
+    ports:
+      - 1883:1883
+      - 8883:8883
+
+networks:
+  backbone:
