@@ -1,6 +1,8 @@
 import { AccessHandler } from './access/access.handler.ts';
+import { AccessTokens } from './access/access.token.ts';
 import { Config } from './config/config.ts';
 import { K8sService } from './k8s/k8s.ts';
+import { OidcHandler } from './oidc/oidc.handler.ts';
 import { MqttServer } from './server/server.ts';
 import { TopicsHandler } from './topics/topics.handler.ts';
 import { Services } from './utils/services.ts';
@@ -38,7 +40,8 @@ class Backbone {
 
   public start = async () => {
     if (this.config.k8s.enabled) {
-      await this.setupK8sOperator();
+      await this.k8s.setup();
+      this.accessHandler.register('k8s', this.k8s.clients);
     }
     if (this.config.http.enabled) {
       console.log('starting http');
@@ -49,11 +52,12 @@ class Backbone {
       const tcp = this.server.getTcpServer();
       tcp.listen(this.config.tcp.port);
     }
-  };
-
-  public setupK8sOperator = async () => {
-    await this.k8s.setup();
-    this.accessHandler.register('k8s', this.k8s.clients);
+    if (this.config.oidc.enabled) {
+      this.accessHandler.register('oidc', this.#services.get(OidcHandler));
+    }
+    if (this.config.tokenSecret) {
+      this.accessHandler.register('token', this.#services.get(AccessTokens));
+    }
   };
 
   public destroy = async () => {

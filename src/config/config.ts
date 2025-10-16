@@ -3,6 +3,29 @@ class Config {
     return process.env.TOKEN_SECRET;
   }
 
+  public get oidc() {
+    const enabled = process.env.OIDC_ENABLED === 'true';
+    const discoveryUrl = process.env.OIDC_DISCOVERY_URL;
+    const clientId = process.env.OIDC_CLIENT_ID;
+    const clientSecret = process.env.OIDC_CLIENT_SECRET;
+    const groupField = process.env.OIDC_GROUP_FIELD || 'groups';
+    const adminGroup = process.env.OIDC_ADMIN_GROUP;
+    const writerGroup = process.env.OIDC_WRITER_GROUP;
+    const readerGroup = process.env.OIDC_READER_GROUP;
+    return {
+      enabled,
+      discoveryUrl,
+      clientId,
+      clientSecret,
+      groupField,
+      groups: {
+        admin: adminGroup,
+        writer: writerGroup,
+        reader: readerGroup,
+      },
+    };
+  }
+
   public get k8s() {
     const enabled = process.env.K8S_ENABLED === 'true';
     return {
