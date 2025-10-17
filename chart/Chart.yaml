@@ -1,0 +1,6 @@
+apiVersion: v2
+name: backbone
+description: A Helm chart for deploying the backbone server
+type: application
+version: 0.2.0
+appVersion: '1.0.0'

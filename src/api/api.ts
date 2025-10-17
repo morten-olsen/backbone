@@ -1,34 +1,16 @@
 import { type FastifyPluginAsync } from 'fastify';
-import { z } from 'zod';
 
 import { manageEndpoints } from './endpoints/endpoints.manage.ts';
 import { authPlugin } from './plugins/plugins.auth.ts';
 import { messageEndpoints } from './endpoints/endpoints.message.ts';
 
-const api: FastifyPluginAsync = async (fastify) => {
-  fastify.route({
-    method: 'get',
-    url: '/health',
-    schema: {
-      operationId: 'health.get',
-      summary: 'Get health status',
-      tags: ['system'],
-      response: {
-        200: z.object({
-          status: z.literal('ok'),
-        }),
-      },
-    },
-    handler: () => {
-      return { status: 'ok' };
-    },
-  });
-  await authPlugin(fastify, {});
+const api: FastifyPluginAsync = async (app) => {
+  await authPlugin(app, {});
 
-  await fastify.register(manageEndpoints, {
+  await app.register(manageEndpoints, {
     prefix: '/manage',
   });
-  await fastify.register(messageEndpoints, {
+  await app.register(messageEndpoints, {
     prefix: '/message',
   });
 };

@@ -1,0 +1,125 @@
+image:
+  repository: ghcr.io/morten-olsen/backbone
+  tag: main
+  pullPolicy: IfNotPresent
+
+nameOverride: ''
+fullnameOverride: ''
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ''
+
+httpService:
+  enabled: false
+  subdomain: backbone
+  environment: ''
+
+config:
+  adminToken: ''
+  jwtSecret: ''
+  httpPort: 8883
+  tcpPort: 1883
+
+k8s:
+  enabled: true
+
+ws:
+  enabled: true
+
+api:
+  enabled: true
+
+tcp:
+  enabled: true
+
+oidc:
+  enabled: false
+  discovery: ''
+  clientId: ''
+  clientSecret: ''
+  groupField: 'groups'
+  adminGroup: ''
+  writerGroup: ''
+  readerGroup: ''
+
+redis:
+  enabled: false
+  host: 'localhost'
+  port: 6379
+  password: ''
+  db: 0
+
+persistence:
+  enabled: false
+  storageClass: ''
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  annotations: {}
+
+service:
+  http:
+    type: ClusterIP
+    port: 80
+    targetPort: 8883
+    annotations: {}
+  tcp:
+    type: ClusterIP
+    port: 1883
+    targetPort: 1883
+    annotations: {}
+
+ingress:
+  enabled: false
+  className: ''
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources: {}
+
+probes:
+  liveness:
+    enabled: true
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    enabled: true
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+timezone: Europe/Amsterdam

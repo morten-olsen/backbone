@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "backbone.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "backbone.labels" . | nindent 4 }}
+  {{- with .Values.service.http.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.http.type }}
+  ports:
+    - port: {{ .Values.service.http.port }}
+      targetPort: {{ .Values.service.http.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "backbone.selectorLabels" . | nindent 4 }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "backbone.fullname" . }}-tcp
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "backbone.labels" . | nindent 4 }}
+  {{- with .Values.service.tcp.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.tcp.type }}
+  ports:
+    - port: {{ .Values.service.tcp.port }}
+      targetPort: {{ .Values.service.tcp.targetPort }}
+      protocol: TCP
+      name: tcp
+  selector:
+    {{- include "backbone.selectorLabels" . | nindent 4 }}

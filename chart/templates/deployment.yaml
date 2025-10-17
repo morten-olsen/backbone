@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "backbone.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "backbone.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "backbone.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "backbone.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "backbone.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.httpPort }}
+              protocol: TCP
+            - name: tcp
+              containerPort: {{ .Values.config.tcpPort }}
+              protocol: TCP
+          env:
+            - name: TZ
+              value: {{ .Values.timezone | quote }}
+            {{- if .Values.config.adminToken }}
+            - name: ADMIN_TOKEN
+              value: {{ .Values.config.adminToken | quote }}
+            {{- end }}
+            {{- if .Values.config.jwtSecret }}
+            - name: JWT_SECRET
+              value: {{ .Values.config.jwtSecret | quote }}
+            {{- end }}
+            - name: HTTP_PORT
+              value: {{ .Values.config.httpPort | quote }}
+            - name: TCP_PORT
+              value: {{ .Values.config.tcpPort | quote }}
+            - name: K8S_ENABLED
+              value: {{ .Values.k8s.enabled | quote }}
+            - name: WS_ENABLED
+              value: {{ .Values.ws.enabled | quote }}
+            - name: API_ENABLED
+              value: {{ .Values.api.enabled | quote }}
+            - name: TCP_ENABLED
+              value: {{ .Values.tcp.enabled | quote }}
+            {{- if .Values.oidc.enabled }}
+            - name: OIDC_ENABLED
+              value: "true"
+            - name: OIDC_DISCOVERY
+              value: {{ .Values.oidc.discovery | quote }}
+            - name: OIDC_CLIENT_ID
+              value: {{ .Values.oidc.clientId | quote }}
+            - name: OIDC_CLIENT_SECRET
+              value: {{ .Values.oidc.clientSecret | quote }}
+            - name: OIDC_GROUP_FIELD
+              value: {{ .Values.oidc.groupField | quote }}
+            {{- if .Values.oidc.adminGroup }}
+            - name: OIDC_ADMIN_GROUP
+              value: {{ .Values.oidc.adminGroup | quote }}
+            {{- end }}
+            {{- if .Values.oidc.writerGroup }}
+            - name: OIDC_WRITER_GROUP
+              value: {{ .Values.oidc.writerGroup | quote }}
+            {{- end }}
+            {{- if .Values.oidc.readerGroup }}
+            - name: OIDC_READER_GROUP
+              value: {{ .Values.oidc.readerGroup | quote }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.redis.enabled }}
+            - name: REDIS_ENABLED
+              value: "true"
+            - name: REDIS_HOST
+              value: {{ .Values.redis.host | quote }}
+            - name: REDIS_PORT
+              value: {{ .Values.redis.port | quote }}
+            {{- if .Values.redis.password }}
+            - name: REDIS_PASSWORD
+              value: {{ .Values.redis.password | quote }}
+            {{- end }}
+            - name: REDIS_DB
+              value: {{ .Values.redis.db | quote }}
+            {{- end }}
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          {{- end }}
+          {{- if .Values.probes.liveness.enabled }}
+          livenessProbe:
+            {{- omit .Values.probes.liveness "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.probes.readiness.enabled }}
+          readinessProbe:
+            {{- omit .Values.probes.readiness "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "backbone.fullname" . }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

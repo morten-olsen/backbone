@@ -1,0 +1,14 @@
+{{- if .Values.httpService.enabled -}}
+apiVersion: homelab.mortenolsen.pro/v1
+kind: HttpService
+metadata:
+  name: '{{ include "backbone.fullname" . }}'
+  namespace: '{{ .Release.Namespace }}'
+spec:
+  environment: '{{ .Values.httpService.environment }}'
+  subdomain: '{{ .Values.httpService.subdomain }}'
+  destination:
+    host: '{{ include "backbone.fullname" . }}'
+    port:
+      number: 80
+{{- end }}

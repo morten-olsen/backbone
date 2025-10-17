@@ -1,0 +1,32 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: backbone
+
+build:
+  artifacts:
+    - image: zot.olsen.cloud/backbone
+      context: .
+      docker:
+        dockerfile: Dockerfile
+
+manifests:
+  helm:
+    releases:
+      - name: backbone
+        chartPath: chart
+        namespace: homelab
+        setValueTemplates:
+          image.repository: 'zot.local/backbone'
+          image.tag: '{{.IMAGE_TAG_zot_olsen_cloud_backbone}}@{{.IMAGE_DIGEST_zot_olsen_cloud_backbone}}'
+          httpService:
+            enabled: true
+            environment: prod
+          service:
+            tcp:
+              type: LoadBalancer
+              port: 1884
+
+deploy:
+  # Use kubectl to apply the manifests.
+  kubectl: {}

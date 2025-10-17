@@ -18,6 +18,7 @@ import { createWebSocketStream } from 'ws';
 import fastifySensible from '@fastify/sensible';
 import redis from 'aedes-persistence-redis';
 import memory from 'aedes-persistence';
+import { z } from 'zod';
 
 import { api } from '../api/api.ts';
 
@@ -174,6 +175,23 @@ class MqttServer {
         prefix: '/api',
       });
     }
+    http.route({
+      method: 'get',
+      url: '/health',
+      schema: {
+        operationId: 'health.get',
+        summary: 'Get health status',
+        tags: ['system'],
+        response: {
+          200: z.object({
+            status: z.literal('ok'),
+          }),
+        },
+      },
+      handler: () => {
+        return { status: 'ok' };
+      },
+    });
     if (config.ws.enabled) {
       http.get('/ws', { websocket: true }, (socket, req) => {
         const stream = createWebSocketStream(socket);
